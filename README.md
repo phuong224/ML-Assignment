@@ -1,4 +1,4 @@
-# Dự án Phân loại Văn bản - Bài tập lớn Môn học Máy học
+# Dự án Phân loại Văn bản - Bài tập lớn Môn học học máy
 
 Dự án này xây dựng và đánh giá một chuỗi các mô hình Machine Learning để giải quyết bài toán phân loại văn bản. Quy trình bao gồm từ tiền xử lý dữ liệu, so sánh các phương pháp trích xuất đặc trưng, tối ưu siêu tham số cho đến việc lựa chọn và lưu trữ mô hình tốt nhất.
 
@@ -38,7 +38,11 @@ Bài toán đặt ra là phân loại các đoạn văn bản vào các danh m�
 Dự án yêu cầu Python 3.x và các thư viện sau. Bạn có thể cài đặt chúng bằng pip:
 
 ```bash
-pip install pandas numpy scikit-learn joblib nltk
+pandas 
+numpy 
+scikit-learn 
+joblib 
+nltk
 ```
 
 ## Cách sử dụng
@@ -88,7 +92,7 @@ Dự án thực hiện một chuỗi các thử nghiệm được định nghĩa
 
 ## Kết luận
 
-Dựa vào các file kết quả trong thư mục `training_results/`, chúng ta có thể so sánh `f1_mean` và `accuracy_mean` của các mô hình để đưa ra kết luận cuối cùng về phương pháp nào là hiệu quả nhất cho bộ dữ liệu này.
+Dựa vào các file kết quả trong thư mục `training_results/` và kết quả được in ra trong màn hình console, chúng ta có thể so sánh performance và những thông tin chi tiết hơn của các mô hình để đưa ra kết luận cuối cùng về phương pháp nào là hiệu quả nhất cho bộ dữ liệu này.
 
 Mô hình tốt nhất sau đó được huấn luyện lại trên toàn bộ tập dữ liệu và lưu lại để có thể tái sử dụng cho các tác vụ dự đoán trong tương lai.
 
