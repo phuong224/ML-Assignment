@@ -187,8 +187,3 @@ def run_all_experiments():
                          save_csv="results_svm.csv")
 
     print(f"All experiments completed. CSV files saved in '{TRAINING_DIR}' folder.")
-
-    return {
-        'ngram_range': best_ngram,
-        'alpha': best_alpha
-    }

@@ -8,11 +8,16 @@ from models import NaiveBayesModel
 MODEL_DIR = "models"
 os.makedirs(MODEL_DIR, exist_ok=True)
 
-def save_final_model(best_ngram, best_alpha):
+def save_final_model():
     """
     Lưu mô hình cuối cùng: MultinomialNB + TF-IDF + best ngram + balanced prior
+    Các tham số `best_ngram` và `best_alpha` được chọn dựa trên kết quả
+    từ quá trình chạy thử nghiệm trong `experiments.py`.
     """
     X, y = load_dataset()
+
+    best_ngram = (1, 2) 
+    best_alpha = 0.1   
 
     n_classes = len(y.unique())
     class_prior = [1.0 / n_classes] * n_classes
@@ -32,9 +37,9 @@ def save_final_model(best_ngram, best_alpha):
 
 def main():
     # Chạy tất cả experiments và lưu CSV
-    best_params = run_all_experiments()
+    run_all_experiments()
     # Lưu mô hình cuối cùng
-    save_final_model(best_params['ngram_range'], best_params['alpha'])
+    save_final_model()
 
 if __name__ == "__main__":
     main()
