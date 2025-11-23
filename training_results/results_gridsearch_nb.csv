@@ -1,0 +1,7 @@
+fold,accuracy,f1_weighted,model,vectorizer,ngram_range,alpha,class_prior,accuracy_mean,accuracy_std,f1_mean,f1_std
+1,0.9589958158995816,0.9563058394718242,NaiveBayesModel,tfidf,"(1, 2)",0.1,,,,,
+2,0.9530988274706867,0.9511793307681045,NaiveBayesModel,tfidf,"(1, 2)",0.1,,,,,
+3,0.9539363484087102,0.951047880280294,NaiveBayesModel,tfidf,"(1, 2)",0.1,,,,,
+4,0.9522613065326633,0.948588644942225,NaiveBayesModel,tfidf,"(1, 2)",0.1,,,,,
+5,0.9556113902847572,0.953583956300325,NaiveBayesModel,tfidf,"(1, 2)",0.1,,,,,
+summary,,,,,,,,0.9547807377192796,0.0023810172887576,0.9521411303525544,0.0026140755733313685
