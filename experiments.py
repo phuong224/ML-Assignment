@@ -3,11 +3,11 @@ import os
 import numpy as np
 import pandas as pd
 from data_loader import load_dataset
-from models import NaiveBayesModel, SVMModel
+from models import NaiveBayesModel
 from utils import preprocess
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.pipeline import Pipeline
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report, f1_score, accuracy_score
 
@@ -18,6 +18,10 @@ def run_kfold_experiment(X, y, model_class, vectorizer_type='tfidf', ngram_range
                          alpha=1.0, class_prior=None, n_splits=5, save_csv=None):
 
     skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
+
+    best_model = None
+    best_macro_f1 = 0.0
+
 
     rows = []
     accs, f1s, macro_f1s = [], [], []
@@ -31,18 +35,13 @@ def run_kfold_experiment(X, y, model_class, vectorizer_type='tfidf', ngram_range
         y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
 
         # Khởi tạo model
-        if model_class == NaiveBayesModel:
-            model = model_class(
+        model = model_class(
                 X_train, y_train,
                 vectorizer_type=vectorizer_type,
                 ngram_range=ngram_range,
                 alpha=alpha,
                 class_prior=class_prior
             )
-        elif model_class == SVMModel:
-            model = model_class(X_train, y_train, ngram_range=ngram_range)
-        else:
-            raise ValueError(f"Unsupported model_class: {model_class}")
 
         y_pred = model.predict(X_test)
 
@@ -54,6 +53,11 @@ def run_kfold_experiment(X, y, model_class, vectorizer_type='tfidf', ngram_range
         macro_p = report['macro avg']['precision']
         macro_r = report['macro avg']['recall']
         macro_f1 = report['macro avg']['f1-score']
+
+        # Lưu lại mô hình tốt nhất
+        if macro_f1 > best_macro_f1:
+            best_macro_f1 = macro_f1
+            best_model = model
 
         # Lưu per-class
         for label in class_labels:
@@ -112,22 +116,22 @@ def run_kfold_experiment(X, y, model_class, vectorizer_type='tfidf', ngram_range
         df_rows = df_rows.dropna(axis=1, how='all')  # để chắc chắn không có cột trống
         df_rows.to_csv(os.path.join(TRAINING_DIR, save_csv), index=False)
 
-    return summary
+    return best_model
 
 
 
 
-def gridsearch_tfidf_nb(n_splits=5, n_jobs=-1, verbose=1):
+def gridsearch_countvec_nb(n_splits=5, n_jobs=-1, verbose=1):
     X, y = load_dataset()
     X_prep = X.apply(preprocess)
 
     pipeline = Pipeline([
-        ('vectorizer', TfidfVectorizer()),
+        ('vectorizer', CountVectorizer()),
         ('classifier', MultinomialNB())
     ])
 
     param_grid = {
-        'vectorizer__ngram_range': [(1,1), (1,2), (1,3)],
+        'vectorizer__ngram_range': [(1,1), (1,2), (1,3), (2, 2), (2,3), (3, 3)],
         'classifier__alpha': [0.01, 0.1, 0.5, 1.0]
     }
 
@@ -142,48 +146,41 @@ def run_all_experiments():
     # Tải dữ liệu một lần duy nhất
     X, y = load_dataset()
 
-    # 1. Baseline CountVectorizer
+    # 1. Baseline CountVectorizer (unigram)
     run_kfold_experiment(X, y, NaiveBayesModel,
                          vectorizer_type='count',
                          ngram_range=(1,1),
                          alpha=1.0,
                          save_csv="results_baseline_count.csv")
 
-    # 2. TF-IDF unigram
+    # 2. Baseline TF-IDF (unigram) để so sánh
     run_kfold_experiment(X, y, NaiveBayesModel,
                          vectorizer_type='tfidf',
                          ngram_range=(1,1),
                          alpha=1.0,
-                         save_csv="results_tfidf_uni.csv")
+                         save_csv="results_baseline_tfidf.csv")
 
-    # 3. GridSearch
+    # 3. GridSearch với CountVectorizer để tìm tham số tốt nhất
     print("\n" + "="*25 + " RUNNING GRIDSEARCH " + "="*25)
-    gs = gridsearch_tfidf_nb()
+    gs = gridsearch_countvec_nb()
     best_ngram = gs['best_params']['vectorizer__ngram_range']
     best_alpha = gs['best_params']['classifier__alpha']
     print(f"GridSearch found best params: ngram_range={best_ngram}, alpha={best_alpha}")
     print("="*70 + "\n")
 
+    # Chạy lại với tham số tốt nhất từ GridSearch
     run_kfold_experiment(X, y, NaiveBayesModel,
-                         vectorizer_type='tfidf',
+                         vectorizer_type='count',
                          ngram_range=best_ngram,
                          alpha=best_alpha,
-                         save_csv="results_gridsearch_nb.csv")
+                         save_csv="results_count_gridsearch.csv")
 
-    # 4. Balanced prior
+    # 4. Balanced prior với tham số tốt nhất
     n_classes = len(y.unique())
     class_prior = [1.0 / n_classes] * n_classes
     run_kfold_experiment(X, y, NaiveBayesModel,
-                         vectorizer_type='tfidf',
+                         vectorizer_type='count',
                          ngram_range=best_ngram,
                          alpha=best_alpha,
                          class_prior=class_prior,
-                         save_csv="results_balanced_prior.csv")
-
-    # 5. Linear SVM
-    run_kfold_experiment(X, y, SVMModel,
-                         vectorizer_type='tfidf',
-                         ngram_range=best_ngram,
-                         save_csv="results_svm.csv")
-
-    print(f"All experiments completed. CSV files saved in '{TRAINING_DIR}' folder.")
+                         save_csv="results_count_balanced_prior.csv")

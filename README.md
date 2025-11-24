@@ -1,22 +1,16 @@
-# Dự án Phân loại Văn bản - Bài tập lớn Môn học học máy
+# Phân loại tin nhắn SMS (Ham/Smishing/Spam) sử dụng Naive Bayes
 
-Dự án này xây dựng và đánh giá một chuỗi các mô hình Machine Learning để giải quyết bài toán phân loại văn bản. Quy trình bao gồm từ tiền xử lý dữ liệu, so sánh các phương pháp trích xuất đặc trưng, tối ưu siêu tham số cho đến việc lựa chọn và lưu trữ mô hình tốt nhất.
+Dự án này xây dựng và đánh giá một chuỗi các mô hình học máy để giải quyết bài toán phân loại tin nhắn SMS thành ba loại: `ham` (tin nhắn thường), `smishing` (tin nhắn lừa đảo), và `spam` (tin nhắn rác/quảng cáo).
 
-## Giới thiệu bài toán
+Quy trình bao gồm từ tiền xử lý dữ liệu, so sánh các phương pháp trích xuất đặc trưng, tối ưu siêu tham số cho đến việc lựa chọn và lưu trữ mô hình tốt nhất dựa trên kết quả đánh giá chéo (cross-validation).
 
-Bài toán đặt ra là phân loại các đoạn văn bản vào các danh mục (labels) đã được định sẵn.
-
-- **Input**: Một đoạn văn bản thô.
-- **Output**: Nhãn (danh mục) tương ứng của đoạn văn bản đó.
-
-Đây là một bài toán phân loại đa lớp (multi-class classification) phổ biến trong lĩnh vực Xử lý Ngôn ngữ Tự nhiên (NLP), có nhiều ứng dụng thực tế như phân loại email (spam/không spam), phân tích cảm xúc (tích cực/tiêu cực/trung tính), phân loại tin tức...
-
-## Cấu trúc thư mục
+## Cấu trúc Project
 
 ```
 .
 ├── data/
 │   └── data.csv          # File chứa dữ liệu huấn luyện (cần được người dùng cung cấp)
+├── figures/ # Chứa các biểu đồ được tạo ra (vd: confusion matrix)
 ├── models/
 │   └── final_nb_model.joblib # Mô hình tốt nhất sau khi huấn luyện, sẵn sàng để sử dụng
 ├── training_results/
